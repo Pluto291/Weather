@@ -1,0 +1,32 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 27
+    buildToolsVersion "27.1.1"
+
+    defaultConfig {
+        applicationId "com.pluto.weather"
+        minSdkVersion 16
+        targetSdkVersion 27
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    api 'com.android.support:appcompat-v7:27.1.1'
+    api 'com.android.support:design:27.1.1'
+    api 'com.android.support:cardview-v7:27.1.1'
+    api 'com.squareup.okhttp3:okhttp:3.9.0'
+    api 'com.google.code.gson:gson:2.6.2'
+    api 'com.github.bumptech.glide:glide:4.5.0'
+    api 'org.litepal.android:java:3.0.0'
+    
+    api fileTree(dir: 'libs', include: ['*.jar'])
+}
