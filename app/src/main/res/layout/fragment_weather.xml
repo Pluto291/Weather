@@ -21,8 +21,6 @@
             <include layout="@layout/weather_forecast"/>
 
             <include layout="@layout/weather_hourly"/>
-                
-             <include layout="@layout/weather_air"/>
 
             <include layout="@layout/weather_detail"/>
 

@@ -8,12 +8,16 @@ import android.widget.TextView;
 import com.pluto.weather.R;
 import com.pluto.weather.model.Detail;
 import java.util.List;
+import com.pluto.weather.gson.WeatherNow;
+import java.util.ArrayList;
 
 public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.ViewHolder> {
-    private List<Detail>details;
+    private WeatherNow weatherNow;
+    private List<Detail>details=new ArrayList<>();
     
-    public DetailAdapter(List<Detail>details){
-        this.details=details;
+    public DetailAdapter(WeatherNow weatherNow){
+        this.weatherNow=weatherNow;
+        handleDetails(weatherNow);
     }
     
     @Override
@@ -34,11 +38,6 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.ViewHolder
     public int getItemCount() {
         return details.size();
     }
-    
-    public void setDetails(List<Detail>details){
-        this.details=details;
-        notifyDataSetChanged();
-    }
 
     class ViewHolder extends RecyclerView.ViewHolder {
         TextView tv_item;
@@ -50,5 +49,13 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.ViewHolder
             tv_item = itemView.findViewById (R.id.tv_item);
             tv_info = itemView.findViewById (R.id.tv_info);
         }
+    }
+    
+    private void handleDetails(WeatherNow weatherNow) {
+        details.add (new Detail ("大气压强", weatherNow.now.pres + "HPA"));
+        details.add (new Detail ("降水量", weatherNow.now.pcpn));
+        details.add (new Detail ("相对湿度", weatherNow.now.hum + "%"));
+        details.add (new Detail ("能见度", weatherNow.now.vis + "KM"));
+        details.add (new Detail ("云量", weatherNow.now.cloud));
     }
 }
