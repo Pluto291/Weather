@@ -1,10 +1,8 @@
 package com.pluto.weather.ui.activity;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -21,6 +19,8 @@ import com.pluto.weather.ui.fragment.WeatherFragment;
 import com.pluto.weather.util.LocationUtil;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 
 public class MainActivity extends AppCompatActivity {
     private final String TAG="MainActivity";
@@ -28,8 +28,8 @@ public class MainActivity extends AppCompatActivity {
         Manifest.permission.ACCESS_FINE_LOCATION,
         Manifest.permission.READ_PHONE_STATE};
 
-    public List<String>coordinates;
-    List<Fragment>fragments;
+    private Set<String>location;;
+    private List<Fragment>fragments;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,18 +59,20 @@ public class MainActivity extends AppCompatActivity {
     private void initViewPager() {
         ViewPager viewPager=findViewById (R.id.view_pager_main);
 
-        coordinates = new ArrayList<> ();
+        location = LocationUtil.readLocationSet (this, "location");
         fragments = new ArrayList<> ();
 
-        if(LocationUtil.getSavedAdCodes (this) != null && LocationUtil.getSavedAdCodes (this).size () != 0) {
-            coordinates.add (LocationUtil.getLocalCoordinate (this));
-            coordinates .addAll (LocationUtil.getSavedAdCodes (this));
-        } else {
-            coordinates.add (LocationUtil.getLocalCoordinate (this));
+        if(location == null) {
+            location = new HashSet<> ();
+            location.add (LocationUtil.getLocalCoordinate (this));
         }
         
-        for(String coordinate:coordinates) {
-            fragments.add (new WeatherFragment (coordinate));
+        LocationUtil.saveLocationSet(this,"location",location);
+        
+        for(String location:location) {
+            if(location != null) {
+                fragments.add (new WeatherFragment (location));
+            }
         }
 
         FragmentAdapter adapter=new FragmentAdapter (getSupportFragmentManager (), fragments);

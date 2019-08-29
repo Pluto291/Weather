@@ -2,50 +2,15 @@ package com.pluto.weather.util;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
-import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 public class LocationUtil {
-    public static List<String>getSavedAdCodes(Context context) {
-        SharedPreferences pref=PreferenceManager.getDefaultSharedPreferences (context);
-        String adCodes=pref.getString ("adCodes", null);
-
-        if(adCodes != null) {
-            String[]separatedAdCodes=adCodes.split (";");
-            List<String>adCodesList=new ArrayList<> ();
-
-            for(String adCode:separatedAdCodes) {
-                adCodesList.add (adCode);
-            }
-
-            return adCodesList;
-        } else {
-            return null;
-        }
-    }
-
-    public static void saveCoordinates(Context context, List<String>adCodes) {
-        SharedPreferences.Editor editor=PreferenceManager.getDefaultSharedPreferences (context).edit ();
-        StringBuilder builder=new StringBuilder ();
-
-        for(int i=0;i < adCodes.size ();i++) {
-            if(i != adCodes.size () - 1) {
-                builder.append (adCodes.get (i) + ";");
-            } else {
-                builder.append (adCodes.get (i));
-            }
-        }
-
-        editor.putString ("adCodes", builder.toString ());
-        editor.apply ();
-    }
-
     public static String getLocalCoordinate(Context context) {
         Location location=null;
         LocationManager manager=(LocationManager)context.getSystemService (Context.LOCATION_SERVICE);
@@ -57,9 +22,22 @@ public class LocationUtil {
         if(manager.isProviderEnabled (LocationManager.NETWORK_PROVIDER)) {
             location = manager.getLastKnownLocation (LocationManager.NETWORK_PROVIDER);
 
-            return location.getLatitude () + "," + location.getLongitude ();
+            return location != null ? location.getLatitude () + "," + location.getLongitude (): null;
         } else {
             return null;
         }
+    }
+
+    public static void saveLocationSet(Context context, String key, Set<String>location) {
+        SharedPreferences.Editor editor=PreferenceManager.getDefaultSharedPreferences (context).edit ();
+        editor.putStringSet (key, location);
+        editor.apply ();
+    }
+
+    public static Set<String> readLocationSet(Context context, String key) {
+        SharedPreferences pref=PreferenceManager.getDefaultSharedPreferences (context);
+        Set<String>location=pref.getStringSet (key, null);
+
+        return location != null ?location: null;
     }
 }

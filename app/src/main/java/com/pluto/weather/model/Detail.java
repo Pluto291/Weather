@@ -1,9 +1,10 @@
 package com.pluto.weather.model;
 
-public class Detail {
+public class Detail
+{
     private String item;
     private String info;
-
+    
     public Detail(String item, String info) {
         this.item = item;
         this.info = info;

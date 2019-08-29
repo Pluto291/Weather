@@ -1,12 +1,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/change_city"
+        android:id="@+id/menu_change_city"
         android:title="城市管理"/>
 
     <item 
-        android:id="@+id/setting"
-        android:title="设置"/>
+        android:id="@+id/menu_about"
+        android:title="关于"/>
 
 </menu>
 

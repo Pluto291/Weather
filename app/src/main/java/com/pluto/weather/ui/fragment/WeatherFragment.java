@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -31,19 +30,21 @@ import java.util.ArrayList;
 import java.util.List;
 import okhttp3.Call;
 import okhttp3.Response;
+import android.support.v7.widget.PopupMenu;
+import android.view.MenuItem;
 
 public class WeatherFragment extends Fragment {
     private final String TAG="WeatherFragment";
 
     private Context context;
-    private String requestCode;
+    private String location;
     private TextView tv_title,tv_tmp,tv_wea,tv_fl,tv_detail_title,tv_forecast_title,tv_hourly_title;
     private Button btn_title;
     private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView recycler_detail,recycler_forecast,recycler_hourly;
 
-    public WeatherFragment(String requestCode) {
-        this.requestCode = requestCode;
+    public WeatherFragment(String location) {
+        this.location = location;
     }
 
     @Override
@@ -79,16 +80,19 @@ public class WeatherFragment extends Fragment {
         super.onActivityCreated (savedInstanceState);
 
         addListener ();
-        if(!readWeather (requestCode)) {
-            requestWeather (requestCode);
+
+        if(needAutoUpdateWeather (location)) {
+            requestWeather (location);
+        } else if(!needAutoUpdateWeather (location) && !readWeather (location)) {
+            requestWeather (location);
         }
     }
 
-    public void requestWeather(final String requestCode) {
+    public void requestWeather(final String location) {
         List<String>urlList=new ArrayList<> ();
-        urlList.add ("https://free-api.heweather.net/s6/weather/now?location=" + requestCode + "&key=bfa0dabcb87f44e3ab0807299a446ff3");
-        urlList.add ("https://free-api.heweather.net/s6/weather/hourly?location=" + requestCode + "&key=bfa0dabcb87f44e3ab0807299a446ff3");
-        urlList.add ("https://free-api.heweather.net/s6/weather/forecast?location=" + requestCode + "&key=bfa0dabcb87f44e3ab0807299a446ff3");
+        urlList.add ("https://free-api.heweather.net/s6/weather/now?location=" + location + "&key=bfa0dabcb87f44e3ab0807299a446ff3");
+        urlList.add ("https://free-api.heweather.net/s6/weather/hourly?location=" + location + "&key=bfa0dabcb87f44e3ab0807299a446ff3");
+        urlList.add ("https://free-api.heweather.net/s6/weather/forecast?location=" + location + "&key=bfa0dabcb87f44e3ab0807299a446ff3");
 
         for(int i=0;i < 3;i++) {
             final int type=i;
@@ -115,7 +119,7 @@ public class WeatherFragment extends Fragment {
                                 @Override
                                 public void run() {
                                     SharedPreferences.Editor editor=PreferenceManager.getDefaultSharedPreferences (context).edit ();
-                                    editor.putString (requestCode + ";" + type, responseContent);
+                                    editor.putString (location + ";" + type, responseContent);
                                     editor.apply ();
 
                                     showWeather (weather);
@@ -128,11 +132,11 @@ public class WeatherFragment extends Fragment {
         }
     }
 
-    public boolean readWeather(String requestCode) {
+    public boolean readWeather(String location) {
         SharedPreferences pref=PreferenceManager.getDefaultSharedPreferences (context);
 
         for(int i=0;i < 3;i++) {
-            String jsonContent=pref.getString (requestCode + ";" + i, null);
+            String jsonContent=pref.getString (location + ";" + i, null);
 
             if(jsonContent != null) {
                 Weather weather=HandleUtil.handleWeather (jsonContent, i);
@@ -143,6 +147,22 @@ public class WeatherFragment extends Fragment {
         }
 
         return true;
+    }
+
+    private boolean needAutoUpdateWeather(String location) {
+        SharedPreferences pref=PreferenceManager.getDefaultSharedPreferences (context);
+        SharedPreferences.Editor editor=pref.edit ();
+        long currentTime=System.currentTimeMillis ();
+        long lastUpdateTime=pref.getLong ("update_time", 0);
+        long updateInterval=30 * 60 * 1000;
+
+        if(currentTime - lastUpdateTime > updateInterval) {
+            editor.putLong ("update_time", currentTime);
+            editor.apply();
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private void showWeather(Weather weather) {
@@ -175,20 +195,27 @@ public class WeatherFragment extends Fragment {
         }
     }
 
-
     private void addListener() {
         btn_title.setOnClickListener (new OnClickListener (){
                 @Override
                 public void onClick(View v) {
+                    PopupMenu popupMenu=new PopupMenu (context, v);
+                    popupMenu.getMenuInflater ().inflate (R.menu.menu_fragment, popupMenu.getMenu ());
+                    popupMenu.setOnMenuItemClickListener (new PopupMenu.OnMenuItemClickListener (){
+                            @Override
+                            public boolean onMenuItemClick(MenuItem item) {
 
+                                return false;
+                            }
+                        });
+                    popupMenu.show ();
                 }
             });
 
         swipeRefreshLayout.setOnRefreshListener (new SwipeRefreshLayout.OnRefreshListener (){
                 @Override
                 public void onRefresh() {
-                    requestWeather (requestCode);
-
+                    requestWeather (location);
                     swipeRefreshLayout.setRefreshing (false);
                 }
             });
