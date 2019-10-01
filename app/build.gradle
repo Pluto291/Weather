@@ -2,14 +2,14 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 28
-    buildToolsVersion "27.1.1"
+    buildToolsVersion "28.0.0"
 
     defaultConfig {
         applicationId "com.pluto.weather"
-        minSdkVersion 16
-        targetSdkVersion 27
-        versionCode 2
-        versionName "1.1"
+        minSdkVersion 19
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0.0"
     }
     buildTypes {
         release {
@@ -20,12 +20,10 @@ android {
 }
 
 dependencies {
-    api 'com.android.support:appcompat-v7:27.1.1'
-    api 'com.android.support:design:27.1.1'
-    api 'com.android.support:cardview-v7:27.1.1'
-    api 'com.squareup.okhttp3:okhttp:3.9.0'
-    api 'com.google.code.gson:gson:2.6.2'
-    api 'com.github.bumptech.glide:glide:4.5.0'
+   	api 'androidx.appcompat:appcompat:1.0.0'
+   	api 'androidx.legacy:legacy-support-v4:1.0.0'
+   	api 'com.google.android.material:material:1.0.0-rc01'
+    api 'androidx.cardview:cardview:1.0.0'
     
     api fileTree(dir: 'libs', include: ['*.jar'])
 }
